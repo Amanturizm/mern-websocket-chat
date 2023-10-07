@@ -1,11 +1,12 @@
-import React from 'react';
+import { useAppSelector } from './app/hook';
+import useRoutes from './routes';
+import Layout from './components/Layout';
 
 const App = () => {
-  return (
-    <div>
-      Chat
-    </div>
-  );
+  const { user } = useAppSelector((state) => state.users);
+  const routes = useRoutes(!!user);
+
+  return <Layout>{routes}</Layout>;
 };
 
 export default App;
