@@ -1,4 +1,5 @@
 import { WebSocket } from 'ws';
+import { Types } from 'mongoose';
 
 export interface ActiveConnections {
   [id: string]: WebSocket;
@@ -16,4 +17,11 @@ export interface IUser {
   role: string;
   displayName?: string | null;
   avatar?: string | null;
+}
+
+export type TUserSecure = Omit<IUser, 'password' | 'token'>;
+
+export interface IMessage {
+  user: Types.ObjectId;
+  text: string;
 }
