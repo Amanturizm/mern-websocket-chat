@@ -36,6 +36,16 @@ export interface IMessage {
   _id: string;
   user: IUserForUsing;
   text: string;
+  datetime: Date;
+}
+
+export interface IMessageForm {
+  text: string;
+}
+
+export interface IMessageRequest {
+  user: string;
+  text: string;
 }
 
 export interface IncomingMessage {

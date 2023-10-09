@@ -1,16 +1,19 @@
 import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
-import { IncomingMessage } from '../../types';
+import { IMessageForm, IMessageRequest, IncomingMessage } from '../../types';
 import { wsUrl } from '../../constants.ts';
 import { useAppDispatch, useAppSelector } from '../../app/hook.ts';
 import { setMessages } from './messagesSlice.ts';
 import Message from './components/Message.tsx';
+import MessageForm from './components/MessageForm.tsx';
 
 const Messages = () => {
   const dispatch = useAppDispatch();
   const { messages } = useAppSelector(state => state.messages);
+  const { user } = useAppSelector(state => state.users);
 
   const ws = useRef<WebSocket | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     ws.current = new WebSocket(wsUrl + 'messages');
@@ -43,11 +46,47 @@ const Messages = () => {
     };
   }, [ws.current]);
 
+  useEffect(() => {
+    if (containerRef.current) {
+      const containerElement: HTMLDivElement = containerRef.current;
+      containerElement.scrollTop = containerElement.scrollHeight;
+    }
+  }, [messages]);
+
+  const sendMessage = (message: IMessageForm) => {
+    if (!ws.current || !user) return;
+
+    const payload: IMessageRequest = {
+      user: user._id,
+      text: message.text,
+    };
+
+    ws.current.send(JSON.stringify({
+      type: 'SET_MESSAGE',
+      payload,
+    }));
+  };
+
   return (
-    <Box>
-      {
-        messages.map(message => <Message message={message} key={message._id} />)
-      }
+    <Box
+      id="chat-body"
+      width={700}
+      border={2}
+      borderRadius={4}
+      paddingX={1.25}
+      paddingBottom={1.25}
+      display="flex"
+      flexDirection="column"
+    >
+      <Box
+        sx={{ height: 500, overflowY: 'auto' }}
+        paddingRight={1}
+        ref={containerRef}
+      >
+        {messages.map(message => <Message message={message} key={message._id}/>)}
+      </Box>
+
+      <MessageForm onSubmit={sendMessage}/>
     </Box>
   );
 };

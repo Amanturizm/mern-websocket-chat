@@ -26,7 +26,6 @@ a:hover {
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -64,4 +63,13 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+#chat-body ::-webkit-scrollbar {
+  width: .5rem;
+}
+
+#chat-body ::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #1a1a1a;
 }

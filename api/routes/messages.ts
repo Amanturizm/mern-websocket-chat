@@ -3,6 +3,7 @@ import expressWs from 'express-ws';
 import Message from '../models/Message';
 import authWs from '../middleware/auth.ws';
 import { ActiveConnections, IMessage, IncomingMessage } from '../types';
+import User from '../models/User';
 
 const app = express();
 const messagesRouter = express.Router();
@@ -44,15 +45,33 @@ messagesRouter.ws('/', (ws) => {
           }));
           break;
         case 'SET_MESSAGE':
-          void await setMessage(JSON.parse(JSON.stringify(payload)) as IMessage);
+          const message = JSON.parse(JSON.stringify(payload)) as IMessage;
+
+          const user = await User.findById(message.user);
+
+          if (!user) break;
+
+          const datetime = new Date().toISOString();
+
+          void await setMessage(message, datetime);
 
           Object.keys(activeConnections).forEach(connId => {
             const conn = activeConnections[connId];
             conn.send(JSON.stringify({
               type: 'NEW_MESSAGE',
-              payload: [payload],
+              payload: [{
+                user: {
+                  _id: user._id,
+                  username: user.username,
+                  displayName: user.displayName,
+                  avatar: user.avatar,
+                },
+                text: message.text,
+                datetime,
+              }],
             }));
           });
+
           break;
         default:
           ws.send(JSON.stringify({
@@ -71,11 +90,11 @@ messagesRouter.ws('/', (ws) => {
   });
 });
 
-async function setMessage(message: IMessage) {
+async function setMessage(message: IMessage, datetime: string) {
   const result = new Message({
     user: message.user,
     text: message.text,
-    datetime: new Date().toISOString(),
+    datetime,
   });
 
   await result.save();
