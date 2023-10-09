@@ -77,20 +77,21 @@ messagesRouter.ws('/:id', (ws, req) => {
 
           const datetime = new Date().toISOString();
 
-          void await setMessage(message, datetime);
+          const newMessage = await setMessage(message, datetime);
 
           Object.keys(activeConnections).forEach(connId => {
             const conn = activeConnections[connId];
             conn.send(JSON.stringify({
               type: 'NEW_MESSAGE',
               payload: [{
+                _id: newMessage._id,
                 user: {
                   _id: user._id,
                   username: user.username,
                   displayName: user.displayName,
                   avatar: user.avatar,
                 },
-                text: message.text,
+                text: newMessage.text,
                 datetime,
               }],
             }));

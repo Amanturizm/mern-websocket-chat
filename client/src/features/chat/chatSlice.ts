@@ -12,7 +12,7 @@ const initialState: State = {
 };
 
 const chatSlice = createSlice({
-  name: 'messages',
+  name: 'chat',
   initialState,
   reducers: {
     setMessages: (state, { payload }: PayloadAction<IMessage[]>) => {
