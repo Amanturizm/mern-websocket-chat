@@ -19,54 +19,55 @@ messagesRouter.ws('/', (ws) => {
     delete activeConnections[id];
   });
 
-  ws.on('message', (msg) => {
+  ws.on('message', async (msg) => {
     const { type, payload } = JSON.parse(msg.toString()) as IncomingMessage;
 
-    (async () => {
-      try {
-        switch (type) {
-          case 'LOGIN':
-            void await authWs(payload);
+    try {
+      switch (type) {
+        case 'LOGIN':
+          void await authWs(payload);
 
-            activeConnections[id].send(JSON.stringify({
-              type: 'LOGIN',
-              payload: 'OK',
-            }));
-            break;
-          case 'GET_MESSAGES':
-            const messages = await Message.find().limit(30);
-
-            activeConnections[id].send(JSON.stringify({
-              type: 'GET_MESSAGES',
-              payload: messages,
-            }));
-            break;
-          case 'SET_MESSAGE':
-            void await setMessage(JSON.parse(JSON.stringify(payload)) as IMessage);
-
-            Object.keys(activeConnections).forEach(connId => {
-              const conn = activeConnections[connId];
-              conn.send(JSON.stringify({
-                type: 'NEW_MESSAGE',
-                payload,
-              }));
-            });
-            break;
-          default:
-            activeConnections[id].send(JSON.stringify({
-              type: 'ERROR',
-              payload: 'This type is not exist',
-            }));
-        }
-      } catch (e) {
-        if (e) {
-          activeConnections[id].send(JSON.stringify({
-            type: 'ERROR',
-            payload: JSON.parse(JSON.stringify(e.toString())),
+          ws.send(JSON.stringify({
+            type: 'LOGIN',
+            payload: 'OK',
           }));
-        }
+          break;
+        case 'GET_MESSAGES':
+          const messages = await Message.find()
+            .sort({ datetime: 1 })
+            .populate('user', 'username role displayName avatar')
+            .limit(30);
+
+          ws.send(JSON.stringify({
+            type: 'GET_MESSAGES',
+            payload: messages,
+          }));
+          break;
+        case 'SET_MESSAGE':
+          void await setMessage(JSON.parse(JSON.stringify(payload)) as IMessage);
+
+          Object.keys(activeConnections).forEach(connId => {
+            const conn = activeConnections[connId];
+            conn.send(JSON.stringify({
+              type: 'NEW_MESSAGE',
+              payload: [payload],
+            }));
+          });
+          break;
+        default:
+          ws.send(JSON.stringify({
+            type: 'ERROR',
+            payload: 'This type is not exist',
+          }));
       }
-    })().catch(console.error);
+    } catch (e) {
+      if (e) {
+        ws.send(JSON.stringify({
+          type: 'ERROR',
+          payload: JSON.parse(JSON.stringify(e.toString())),
+        }));
+      }
+    }
   });
 });
 
@@ -74,6 +75,7 @@ async function setMessage(message: IMessage) {
   const result = new Message({
     user: message.user,
     text: message.text,
+    datetime: new Date().toISOString(),
   });
 
   await result.save();

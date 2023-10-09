@@ -24,4 +24,5 @@ export type TUserSecure = Omit<IUser, 'password' | 'token'>;
 export interface IMessage {
   user: Types.ObjectId;
   text: string;
+  datetime: Date,
 }
