@@ -8,7 +8,7 @@ export interface IUser {
   avatar?: File | null;
 }
 
-export interface IUserForUsing extends IUser {
+export interface IUserForUsing extends Omit<IUser, 'password' | 'token'> {
   avatar: string | null;
 }
 
@@ -30,4 +30,15 @@ export interface IValidationError {
   message: string;
   name: string;
   _message: string;
+}
+
+export interface IMessage {
+  _id: string;
+  user: IUserForUsing;
+  text: string;
+}
+
+export interface IncomingMessage {
+  type: string;
+  payload: IMessage[];
 }
