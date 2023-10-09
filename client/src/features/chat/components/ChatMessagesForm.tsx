@@ -11,7 +11,7 @@ const initialState: IMessageForm = {
   text: '',
 };
 
-const MessageForm: React.FC<Props> = ({ onSubmit }) => {
+const ChatMessagesForm: React.FC<Props> = ({ onSubmit }) => {
   const [state, setState] = useState<IMessageForm>(initialState);
 
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +36,7 @@ const MessageForm: React.FC<Props> = ({ onSubmit }) => {
     >
       <TextField
         required
-        placeholder="Message"
+        placeholder="ChatMessage"
         inputProps={{ style: { color: 'white' } }}
         sx={{ '& fieldset': { borderRadius: 2 }, width: '100%' }}
         name="text"
@@ -60,4 +60,4 @@ const MessageForm: React.FC<Props> = ({ onSubmit }) => {
   );
 };
 
-export default MessageForm;
+export default ChatMessagesForm;

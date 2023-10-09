@@ -1,11 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Signup from './features/users/Signup';
 import Login from './features/users/Login';
-import Messages from './features/messages/Messages.tsx';
+import Chat from './features/chat/Chat.tsx';
 
 const useRoutes = (isAuthenticated: boolean) => (
   <Routes>
-    {/* All */}
     {!isAuthenticated ? (
       <>
         <Route path="/signup" element={<Signup />} />
@@ -14,7 +13,7 @@ const useRoutes = (isAuthenticated: boolean) => (
       </>
     ) : (
       <>
-        <Route path="/" element={<Messages />} />
+        <Route path="/" element={<Chat />} />
       </>
     )}
     <Route path="*" element={<Navigate to="/" />} />

@@ -50,5 +50,5 @@ export interface IMessageRequest {
 
 export interface IncomingMessage {
   type: string;
-  payload: IMessage[];
+  payload: [];
 }

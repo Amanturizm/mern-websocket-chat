@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { usersReducer } from '../features/users/usersSlice';
-import { messagesReducer } from '../features/messages/messagesSlice.ts';
+import { chatReducer } from '../features/chat/chatSlice.ts';
 
 const usersPersistConfig = {
   key: 'music:users',
@@ -12,7 +12,7 @@ const usersPersistConfig = {
 
 const rootReducer = combineReducers({
   users: persistReducer(usersPersistConfig, usersReducer),
-  messages: messagesReducer,
+  chat: chatReducer,
 });
 
 export const store = configureStore({

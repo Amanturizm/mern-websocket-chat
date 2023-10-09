@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 app.use('/users', usersRouter);
-app.use('/messages', messagesRouter);
+app.use('/chat', messagesRouter);
 
 (async () => {
   await mongoose.connect(config.db);

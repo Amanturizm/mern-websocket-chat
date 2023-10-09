@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Box, Card, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Card, Divider, Stack, Typography } from '@mui/material';
 import { IMessage } from '../../../types';
 import { apiUrl } from '../../../constants.ts';
 import dayjs from 'dayjs';
@@ -10,7 +10,7 @@ interface Props {
 
 const colors = ['#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FFC0CB', '#800080', '#FFA500'];
 
-const Message: React.FC<Props> = ({ message }) => {
+const ChatMessage: React.FC<Props> = ({ message }) => {
   const date = dayjs(message.datetime).format('DD/MM/YYYY HH:mm:ss');
   const timeDifference = -dayjs(message.datetime).diff();
 
@@ -31,7 +31,7 @@ const Message: React.FC<Props> = ({ message }) => {
   };
 
   return (
-    <Card sx={{ overflow: 'visible', mt: 2 }}>
+    <Card sx={{ mt: 2 }}>
       <Box sx={{ px: 2, py: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
         {
           message.user.avatar ?
@@ -51,11 +51,11 @@ const Message: React.FC<Props> = ({ message }) => {
           </Typography>
         </Stack>
       </Box>
-      <hr style={{ margin: 0 }} />
+      <Divider />
       <Typography sx={{ m: 2 }}>
         {message.text}
       </Typography>
     </Card>
   );
 };
-export default Message;
+export default ChatMessage;

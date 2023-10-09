@@ -2,8 +2,9 @@ import express from 'express';
 import expressWs from 'express-ws';
 import Message from '../models/Message';
 import authWs from '../middleware/auth.ws';
-import { ActiveConnections, IMessage, IncomingMessage } from '../types';
+import { ActiveConnections, IMessage, IncomingMessage, IUser } from '../types';
 import User from '../models/User';
+import { HydratedDocument } from 'mongoose';
 
 const app = express();
 const messagesRouter = express.Router();
@@ -12,8 +13,8 @@ expressWs(app);
 
 const activeConnections: ActiveConnections = {};
 
-messagesRouter.ws('/', (ws) => {
-  const id = crypto.randomUUID();
+messagesRouter.ws('/:id', (ws, req) => {
+  const id = req.params.id;
   activeConnections[id] = ws;
 
   ws.on('close', () => {
@@ -31,6 +32,29 @@ messagesRouter.ws('/', (ws) => {
           ws.send(JSON.stringify({
             type: 'LOGIN',
             payload: 'OK',
+          }));
+          break;
+        case 'GET_USERS':
+          const onlineUsers: HydratedDocument<IUser>[] = [];
+
+          const promises = Object.keys(activeConnections).map(async (userId) => {
+            const user = await User.findById(userId);
+            if (user) {
+              onlineUsers.push(user);
+            }
+          });
+
+          await Promise.all(promises);
+
+          ws.send(JSON.stringify({
+            type: 'GET_USERS',
+            payload: onlineUsers.map(user => ({
+              _id: user._id,
+              username: user.username,
+              displayName: user.displayName,
+              role: user.role,
+              avatar: user.avatar,
+            })),
           }));
           break;
         case 'GET_MESSAGES':
